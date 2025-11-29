@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class DocumentService {
-    
+
     private final Map<String, Document> documents = new ConcurrentHashMap<>();
 
     public Document getDocument(String id) {

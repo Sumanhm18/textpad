@@ -20,7 +20,7 @@ public class DocumentController {
     @MessageMapping("/document.update/{documentId}")
     @SendTo("/topic/document/{documentId}")
     public DocumentUpdate updateDocument(@DestinationVariable String documentId,
-                                         @Payload DocumentUpdate update) {
+            @Payload DocumentUpdate update) {
         // Update the document in the service
         documentService.updateDocument(documentId, update.getContent());
         return update;
@@ -34,8 +34,8 @@ public class DocumentController {
 
     @PostMapping("/api/document/{documentId}")
     @ResponseBody
-    public Document saveDocument(@PathVariable String documentId, 
-                                 @RequestBody String content) {
+    public Document saveDocument(@PathVariable String documentId,
+            @RequestBody String content) {
         return documentService.updateDocument(documentId, content);
     }
 }

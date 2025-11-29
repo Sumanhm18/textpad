@@ -5,6 +5,7 @@ A real-time collaborative platform built with Spring Boot and WebSocket, featuri
 ## Features
 
 ### Collaborative Text Editor (DontPad Clone)
+
 - 📝 Real-time collaborative text editing
 - 🔄 Automatic synchronization across all users
 - 💾 Auto-save functionality
@@ -12,6 +13,7 @@ A real-time collaborative platform built with Spring Boot and WebSocket, featuri
 - 👥 Multiple users can edit simultaneously
 
 ### Chat Application
+
 - Real-time messaging using WebSocket (STOMP protocol)
 - Simple and clean UI
 - User join/leave notifications
@@ -26,32 +28,42 @@ A real-time collaborative platform built with Spring Boot and WebSocket, featuri
 
 1. Build the project:
    ```bash
-3. Open your browser and navigate to:
-   
+
+   ```
+2. Open your browser and navigate to:
+
    **For Collaborative Editor (DontPad Clone):**
+
    ```
    http://localhost:8080
    ```
+
    Or access specific documents:
+
    ```
    http://localhost:8080/my-document
    http://localhost:8080/shopping-list
    ```
-   
+
    **For Chat Application:**
+
    ```
    http://localhost:8080/chat
    ```
 
-4. Start typing or chatting! Changes are synchronized in real-time.
+3. Start typing or chatting! Changes are synchronized in real-time.
+
    ```
 
-3. Open your browser and navigate to:
+   ```
+
+4. Open your browser and navigate to:
+
    ```
    http://localhost:8080
    ```
 
-4. Enter your name and start chatting!
+5. Enter your name and start chatting!
 
 ## Project Structure
 
@@ -110,3 +122,4 @@ chatbot/
 - Spring WebSocket
 - SockJS (WebSocket fallback)
 - STOMP messaging protocol
+```

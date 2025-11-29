@@ -1,7 +1,7 @@
 package com.example.chatbot.model;
 
 public class Document {
-    
+
     private String id;
     private String content;
     private long lastModified;

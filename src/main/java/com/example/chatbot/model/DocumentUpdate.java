@@ -1,7 +1,7 @@
 package com.example.chatbot.model;
 
 public class DocumentUpdate {
-    
+
     private String documentId;
     private String content;
     private String userId;
