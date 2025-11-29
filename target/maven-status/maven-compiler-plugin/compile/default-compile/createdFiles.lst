@@ -1,0 +1,10 @@
+com/example/chatbot/config/WebSocketConfig.class
+com/example/chatbot/controller/HomeController.class
+com/example/chatbot/model/Document.class
+com/example/chatbot/model/DocumentUpdate.class
+com/example/chatbot/ChatBotApplication.class
+com/example/chatbot/controller/ChatController.class
+com/example/chatbot/model/ChatMessage$MessageType.class
+com/example/chatbot/service/DocumentService.class
+com/example/chatbot/controller/DocumentController.class
+com/example/chatbot/model/ChatMessage.class

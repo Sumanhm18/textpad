@@ -1,0 +1,393 @@
+like <!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DontPad Clone - Real-time Collaborative Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background: #fafafa;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #333;
+            color: #fff;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 16px;
+            font-weight: normal;
+        }
+
+        .url-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .current-url {
+            background: #444;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .current-url span {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.disconnected {
+            background: #f44336;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .info-bar {
+            background: #e8f5e9;
+            padding: 6px 15px;
+            border-bottom: 1px solid #c8e6c9;
+            font-size: 12px;
+            color: #2e7d32;
+        }
+
+        .info-bar strong {
+            color: #1b5e20;
+        }
+
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #editor {
+            flex: 1;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            outline: none;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            line-height: 1.6;
+            resize: none;
+            background: #fff;
+            color: #333;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .footer {
+            display: none;
+        }
+
+        .home-page {
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .home-page h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .home-page p {
+            margin-bottom: 20px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .home-page input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .home-page button {
+            width: 100%;
+            padding: 12px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .home-page button:hover {
+            background: #45a049;
+        }
+
+        .examples {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .examples h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .examples a {
+            display: block;
+            color: #4CAF50;
+            text-decoration: none;
+            margin: 5px 0;
+        }
+
+        .examples a:hover {
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Home Page -->
+    <div id="home-page">
+        <div class="home-page">
+            <h2>📝 DontPad Clone - Real-time Collaborative Editor</h2>
+            <p>
+                Create and share text documents instantly. Just enter a document name and start typing.
+                Anyone with the same URL can edit simultaneously in real-time!
+            </p>
+            <input type="text" id="docName" placeholder="Enter document name (e.g., shopping-list)" autocomplete="off" />
+            <button onclick="openDocument()">Open Document</button>
+            
+            <div class="examples">
+                <h3>Try these examples:</h3>
+                <a href="#" onclick="openDocumentByName('shopping-list'); return false;">shopping-list</a>
+                <a href="#" onclick="openDocumentByName('meeting-notes'); return false;">meeting-notes</a>
+                <a href="#" onclick="openDocumentByName('todo'); return false;">todo</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Editor Page -->
+    <div id="editor-page" class="hidden">
+        <div class="header">
+            <h1>📝 Real-time Collaborative Editor</h1>
+            <div class="url-info">
+                <div class="current-url">
+                    Document: <span id="documentName"></span>
+                </div>
+                <div class="status">
+                    <div class="status-indicator" id="statusIndicator"></div>
+                    <span id="statusText">Connected</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-bar">
+            <strong>💡 Tip:</strong> Share this URL with others to collaborate in real-time. Changes are saved automatically and synced across all users.
+        </div>
+
+        <div class="editor-container">
+            <textarea id="editor" placeholder="Start typing... Your changes will be saved automatically and synced in real-time with other users."></textarea>
+        </div>
+
+        <div class="footer">
+            Changes are automatically saved • Last updated: <span id="lastUpdate">Never</span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script>
+        let stompClient = null;
+        let currentDocId = null;
+        let userId = 'user_' + Math.random().toString(36).substr(2, 9);
+        let isUpdating = false;
+        let debounceTimer = null;
+
+        // Check URL on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const path = window.location.pathname;
+            if (path && path !== '/' && path !== '/index.html') {
+                const docId = path.substring(1);
+                loadDocument(docId);
+            }
+        });
+
+        function openDocument() {
+            const docName = document.getElementById('docName').value.trim();
+            if (docName) {
+                openDocumentByName(docName);
+            }
+        }
+
+        function openDocumentByName(docName) {
+            const cleanName = docName.replace(/[^a-zA-Z0-9-_]/g, '-');
+            window.history.pushState({}, '', '/' + cleanName);
+            loadDocument(cleanName);
+        }
+
+        function loadDocument(docId) {
+            currentDocId = docId;
+            
+            // Show editor page
+            document.getElementById('home-page').classList.add('hidden');
+            document.getElementById('editor-page').classList.remove('hidden');
+            document.getElementById('documentName').textContent = docId;
+
+            // Load existing content
+            fetch('/api/document/' + docId)
+                .then(response => response.json())
+                .then(data => {
+                    const editor = document.getElementById('editor');
+                    editor.value = data.content || '';
+                    updateLastUpdateTime();
+                })
+                .catch(error => {
+                    console.error('Error loading document:', error);
+                });
+
+            // Connect to WebSocket
+            connectWebSocket();
+        }
+
+        function connectWebSocket() {
+            const socket = new SockJS('/ws-document');
+            stompClient = Stomp.over(socket);
+
+            stompClient.connect({}, function(frame) {
+                console.log('Connected: ' + frame);
+                updateStatus(true);
+
+                // Subscribe to document updates
+                stompClient.subscribe('/topic/document/' + currentDocId, function(message) {
+                    const update = JSON.parse(message.body);
+                    
+                    // Only update if it's from another user
+                    if (update.userId !== userId) {
+                        isUpdating = true;
+                        const editor = document.getElementById('editor');
+                        const scrollPos = editor.scrollTop;
+                        editor.value = update.content;
+                        editor.scrollTop = scrollPos;
+                        updateLastUpdateTime();
+                        isUpdating = false;
+                    }
+                });
+            }, function(error) {
+                console.error('WebSocket error:', error);
+                updateStatus(false);
+            });
+        }
+
+        function updateStatus(connected) {
+            const indicator = document.getElementById('statusIndicator');
+            const text = document.getElementById('statusText');
+            
+            if (connected) {
+                indicator.classList.remove('disconnected');
+                text.textContent = 'Connected';
+            } else {
+                indicator.classList.add('disconnected');
+                text.textContent = 'Disconnected';
+            }
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString();
+            document.getElementById('lastUpdate').textContent = timeStr;
+        }
+
+        // Listen for text changes
+        document.addEventListener('DOMContentLoaded', function() {
+            const editor = document.getElementById('editor');
+            
+            editor.addEventListener('input', function() {
+                if (isUpdating) return;
+
+                // Debounce updates to avoid sending too many messages
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(function() {
+                    const content = editor.value;
+                    
+                    // Send update via WebSocket
+                    if (stompClient && stompClient.connected) {
+                        const update = {
+                            documentId: currentDocId,
+                            content: content,
+                            userId: userId
+                        };
+                        stompClient.send('/app/document.update/' + currentDocId, {}, JSON.stringify(update));
+                        updateLastUpdateTime();
+                    }
+
+                    // Also save to server via REST API
+                    fetch('/api/document/' + currentDocId, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(content)
+                    });
+                }, 300); // Wait 300ms after user stops typing
+            });
+
+            // Handle Enter key on home page
+            document.getElementById('docName').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    openDocument();
+                }
+            });
+        });
+
+        // Handle browser back button
+        window.addEventListener('popstate', function() {
+            window.location.reload();
+        });
+    </script>
+</body>
+</html>

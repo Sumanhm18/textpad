@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket ChatBot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chat-container {
+            width: 500px;
+            height: 600px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f5f5f5;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.sent {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .message.received {
+            background: white;
+            border: 1px solid #ddd;
+        }
+
+        .message.event {
+            background: #ffe0b2;
+            text-align: center;
+            margin: 10px auto;
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        .sender {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        #username-page {
+            text-align: center;
+        }
+
+        #username-page h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">WebSocket ChatBot</div>
+        
+        <div id="username-page">
+            <div style="padding: 40px;">
+                <h2>Enter your name to join</h2>
+                <input type="text" id="name" placeholder="Your name" autocomplete="off" />
+                <button id="join-btn" onclick="connect(event)">Join Chat</button>
+            </div>
+        </div>
+
+        <div id="chat-page" class="hidden">
+            <div class="chat-messages" id="messageArea"></div>
+            <div class="chat-input-container">
+                <input type="text" id="message" placeholder="Type a message..." autocomplete="off" />
+                <button onclick="sendMessage(event)">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script>
+        let stompClient = null;
+        let username = null;
+
+        function connect(event) {
+            event.preventDefault();
+            username = document.querySelector('#name').value.trim();
+
+            if(username) {
+                document.querySelector('#username-page').classList.add('hidden');
+                document.querySelector('#chat-page').classList.remove('hidden');
+
+                const socket = new SockJS('/ws-chat');
+                stompClient = Stomp.over(socket);
+
+                stompClient.connect({}, onConnected, onError);
+            }
+        }
+
+        function onConnected() {
+            // Subscribe to the public topic
+            stompClient.subscribe('/topic/public', onMessageReceived);
+
+            // Tell the server that a new user joined
+            stompClient.send("/app/chat.addUser",
+                {},
+                JSON.stringify({sender: username, type: 'JOIN'})
+            );
+        }
+
+        function onError(error) {
+            console.error('Could not connect to WebSocket server. Please refresh this page to try again!', error);
+        }
+
+        function sendMessage(event) {
+            event.preventDefault();
+            const messageContent = document.querySelector('#message').value.trim();
+
+            if(messageContent && stompClient) {
+                const chatMessage = {
+                    sender: username,
+                    content: messageContent,
+                    type: 'CHAT'
+                };
+
+                stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(chatMessage));
+                document.querySelector('#message').value = '';
+            }
+        }
+
+        function onMessageReceived(payload) {
+            const message = JSON.parse(payload.body);
+            const messageArea = document.querySelector('#messageArea');
+
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+
+            if(message.type === 'JOIN') {
+                messageElement.classList.add('event');
+                messageElement.textContent = message.sender + ' joined!';
+            } else if(message.type === 'LEAVE') {
+                messageElement.classList.add('event');
+                messageElement.textContent = message.sender + ' left!';
+            } else {
+                if(message.sender === username) {
+                    messageElement.classList.add('sent');
+                } else {
+                    messageElement.classList.add('received');
+                    const senderElement = document.createElement('div');
+                    senderElement.classList.add('sender');
+                    senderElement.textContent = message.sender;
+                    messageElement.appendChild(senderElement);
+                }
+                const textElement = document.createElement('div');
+                textElement.textContent = message.content;
+                messageElement.appendChild(textElement);
+            }
+
+            messageArea.appendChild(messageElement);
+            messageArea.scrollTop = messageArea.scrollHeight;
+        }
+
+        // Send message on Enter key
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('#message').addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') {
+                    sendMessage(e);
+                }
+            });
+
+            document.querySelector('#name').addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') {
+                    connect(e);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
