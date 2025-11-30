@@ -8,3 +8,4 @@ com/example/chatbot/model/ChatMessage$MessageType.class
 com/example/chatbot/service/DocumentService.class
 com/example/chatbot/controller/DocumentController.class
 com/example/chatbot/model/ChatMessage.class
+com/example/chatbot/repository/DocumentRepository.class

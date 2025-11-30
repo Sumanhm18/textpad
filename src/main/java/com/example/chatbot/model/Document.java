@@ -1,9 +1,8 @@
 package com.example.chatbot.model;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "documents")
+@org.springframework.data.mongodb.core.mapping.Document(collection = "documents")
 public class Document {
     
     @Id
