@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DontPad Clone - Real-time Collaborative Editor</title>
+    <title>notepad</title>
     <style>
         * {
             margin: 0;
@@ -12,12 +12,15 @@
         }
 
         html {
-            background: #ffffff;
+            background: #ffffff !important;
+            background-image: none !important;
         }
 
         body {
             font-family: 'Courier New', Courier, monospace;
             background: #ffffff !important;
+            background-image: none !important;
+            background-color: #ffffff !important;
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -92,6 +95,7 @@
             overflow: hidden;
             width: 100%;
             height: 100%;
+            min-height: 100vh;
             background: #ffffff !important;
         }
 
@@ -191,26 +195,28 @@
         .hidden {
             display: none !important;
         }
+        
+        #editor-page {
+            background: #ffffff !important;
+            background-image: none !important;
+        }
     </style>
 </head>
 <body>
     <!-- Home Page -->
     <div id="home-page">
         <div class="home-page">
-            <h2>📝 DontPad Clone - Real-time Collaborative Editor</h2>
-            <p>
-                Create and share text documents instantly. Just enter a document name and start typing.
-                Anyone with the same URL can edit simultaneously in real-time!
-            </p>
-            <input type="text" id="docName" placeholder="Enter document name (e.g., shopping-list)" autocomplete="off" />
+            <h2>Notepad </h2>
+            
+            <input type="text" id="docName" placeholder="Enter document name " autocomplete="on" />
             <button onclick="openDocument()">Open Document</button>
             
-            <div class="examples">
+            <!-- <div class="examples">
                 <h3>Try these examples:</h3>
                 <a href="#" onclick="openDocumentByName('shopping-list'); return false;">shopping-list</a>
                 <a href="#" onclick="openDocumentByName('meeting-notes'); return false;">meeting-notes</a>
                 <a href="#" onclick="openDocumentByName('todo'); return false;">todo</a>
-            </div>
+            </div> -->
         </div>
     </div>
 
@@ -230,15 +236,14 @@
         </div>
 
         <div class="info-bar">
-            <strong>💡 Tip:</strong> Share this URL with others to collaborate in real-time. Changes are saved automatically and synced across all users.
+            <strong></strong>
         </div>
-
         <div class="editor-container">
-            <textarea id="editor" placeholder="Start typing... Your changes will be saved automatically and synced in real-time with other users."></textarea>
+            <textarea id="editor" placeholder="Start typing"></textarea>
         </div>
 
         <div class="footer">
-            Changes are automatically saved • Last updated: <span id="lastUpdate">Never</span>
+            Changes are automatically saved <span id="lastUpdate">Never</span>
         </div>
     </div>
 
@@ -313,9 +318,18 @@
                     if (update.userId !== userId) {
                         isUpdating = true;
                         const editor = document.getElementById('editor');
+                        
+                        // Preserve cursor position and scroll
+                        const cursorPos = editor.selectionStart;
                         const scrollPos = editor.scrollTop;
+                        
                         editor.value = update.content;
+                        
+                        // Restore cursor and scroll position
+                        editor.selectionStart = cursorPos;
+                        editor.selectionEnd = cursorPos;
                         editor.scrollTop = scrollPos;
+                        
                         updateLastUpdateTime();
                         isUpdating = false;
                     }
