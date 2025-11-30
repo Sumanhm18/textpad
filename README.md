@@ -1,6 +1,6 @@
 # Real-time Collaborative Platform
 
-A real-time collaborative platform built with Spring Boot and WebSocket, featuring both a chat application and a collaborative text editor (like dontpad.com).
+A real-time collaborative platform built with Spring Boot and WebSocket, featuring both a chat application and a collaborative text editor (like dontpad.com) with MongoDB persistence.
 
 ## Features
 
@@ -8,7 +8,7 @@ A real-time collaborative platform built with Spring Boot and WebSocket, featuri
 
 - Real-time collaborative text editing
 - Automatic synchronization across all users
-- Auto-save functionality
+- Persistent storage with MongoDB
 - Share documents via simple URLs
 - Multiple users can edit simultaneously
 
@@ -23,26 +23,30 @@ A real-time collaborative platform built with Spring Boot and WebSocket, featuri
 
 - Java 17 or higher
 - Maven 3.6+
+- MongoDB Atlas account (or local MongoDB installation)
 
 ## How to Run
 
 1. Build the project:
+
    ```bash
-mvn compile package
+   mvn clean package
    ```
-2. Open your browser and navigate to:
+
+2. Run the application:
+
+   ```bash
+   mvn spring-boot:run
+   ```
+
+3. Access the application:
 
    **For Collaborative Editor (DontPad Clone):**
 
    ```
-   http://localhost:8080
-   ```
-
-   Or access specific documents:
-
-   ```
    http://localhost:8080/my-document
    http://localhost:8080/shopping-list
+   http://localhost:8080/any-document-name
    ```
 
    **For Chat Application:**
@@ -50,20 +54,6 @@ mvn compile package
    ```
    http://localhost:8080/chat
    ```
-
-3. Start typing or chatting! Changes are synchronized in real-time.
-
-   ```
-http://localhost:8080/"any endpoint"
-   ```
-
-4. Open your browser and navigate to:
-
-   ```
-   http://localhost:8080
-   ```
-
-5. Enter your name and start chatting!
 
 ## Project Structure
 
@@ -85,23 +75,32 @@ chatbot/
 │   │   │   │   └── DocumentUpdate.java
 │   │   │   └── service/
 │   │   │       └── DocumentService.java
+│   │   │   └── repository/
+│   │   │       └── DocumentRepository.java
 │   │   └── resources/
+│   │       ├── application.properties
+│   │       └── static/
+│   │           ├── index.html (chat UI)
+│   │           └── pad.html (editor UI)
+└── pom.xml
+
 ## Technology Stack
 
 - Spring Boot 3.2.0
 - Spring WebSocket
+- Spring Data MongoDB
+- MongoDB Atlas
 - SockJS (WebSocket fallback)
 - STOMP messaging protocol
-- In-memory document storage (ConcurrentHashMap)
 
 ## How It Works
 
 ### Collaborative Editor
-1. Users access a document via URL 
-2. The document is loaded from in-memory storage or created if new
+1. Users access a document via URL
+2. The document is loaded from MongoDB or created if new
 3. WebSocket connection is established for real-time sync
 4. Any changes are broadcast to all connected users editing the same document
-5. Changes are automatically saved to the server
+5. Changes are automatically saved to MongoDB
 
 ### Chat Application
 1. Users enter their name to join the chat room
@@ -115,11 +114,5 @@ chatbot/
 - **Quick text sharing** without account creation
 - **Real-time brainstorming** sessions
 - **Simple chat** for quick communication
-
-## Technology Stack
-
-- Spring Boot 3.2.0
-- Spring WebSocket
-- SockJS (WebSocket fallback)
-- STOMP messaging protocol
+- **Persistent document storage** with MongoDB
 ```
