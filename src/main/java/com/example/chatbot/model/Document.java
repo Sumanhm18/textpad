@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id;
 
 @org.springframework.data.mongodb.core.mapping.Document(collection = "documents")
 public class Document {
-    
+
     @Id
     private String id;
     private String content;
@@ -25,7 +25,9 @@ public class Document {
         this.id = id;
         this.content = content;
         this.lastModified = System.currentTimeMillis();
-    }    public String getId() {
+    }
+
+    public String getId() {
         return id;
     }
 

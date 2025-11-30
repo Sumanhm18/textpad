@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Service
 public class DocumentService {
-    
+
     @Autowired
     private DocumentRepository documentRepository;
 
@@ -26,14 +26,14 @@ public class DocumentService {
     public Document updateDocument(String id, String content) {
         Optional<Document> existingDoc = documentRepository.findById(id);
         Document document;
-        
+
         if (existingDoc.isPresent()) {
             document = existingDoc.get();
             document.setContent(content);
         } else {
             document = new Document(id, content);
         }
-        
+
         return documentRepository.save(document);
     }
 

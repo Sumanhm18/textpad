@@ -6,11 +6,11 @@ A real-time collaborative platform built with Spring Boot and WebSocket, featuri
 
 ### Collaborative Text Editor (DontPad Clone)
 
-- 📝 Real-time collaborative text editing
-- 🔄 Automatic synchronization across all users
-- 💾 Auto-save functionality
-- 🌐 Share documents via simple URLs
-- 👥 Multiple users can edit simultaneously
+- Real-time collaborative text editing
+- Automatic synchronization across all users
+- Auto-save functionality
+- Share documents via simple URLs
+- Multiple users can edit simultaneously
 
 ### Chat Application
 
@@ -28,7 +28,7 @@ A real-time collaborative platform built with Spring Boot and WebSocket, featuri
 
 1. Build the project:
    ```bash
-
+mvn compile package
    ```
 2. Open your browser and navigate to:
 
@@ -54,7 +54,7 @@ A real-time collaborative platform built with Spring Boot and WebSocket, featuri
 3. Start typing or chatting! Changes are synchronized in real-time.
 
    ```
-
+http://localhost:8080/"any endpoint"
    ```
 
 4. Open your browser and navigate to:
@@ -97,7 +97,7 @@ chatbot/
 ## How It Works
 
 ### Collaborative Editor
-1. Users access a document via URL (e.g., `/shopping-list`)
+1. Users access a document via URL 
 2. The document is loaded from in-memory storage or created if new
 3. WebSocket connection is established for real-time sync
 4. Any changes are broadcast to all connected users editing the same document
