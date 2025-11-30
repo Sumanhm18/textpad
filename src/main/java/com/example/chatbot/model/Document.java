@@ -1,7 +1,12 @@
 package com.example.chatbot.model;
 
-public class Document {
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document(collection = "documents")
+public class Document {
+    
+    @Id
     private String id;
     private String content;
     private long lastModified;
@@ -21,9 +26,7 @@ public class Document {
         this.id = id;
         this.content = content;
         this.lastModified = System.currentTimeMillis();
-    }
-
-    public String getId() {
+    }    public String getId() {
         return id;
     }
 

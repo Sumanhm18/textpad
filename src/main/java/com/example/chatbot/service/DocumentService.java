@@ -1,31 +1,47 @@
 package com.example.chatbot.service;
 
 import com.example.chatbot.model.Document;
+import com.example.chatbot.repository.DocumentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
 
 @Service
 public class DocumentService {
-
-    private final Map<String, Document> documents = new ConcurrentHashMap<>();
+    
+    @Autowired
+    private DocumentRepository documentRepository;
 
     public Document getDocument(String id) {
-        return documents.computeIfAbsent(id, Document::new);
+        Optional<Document> doc = documentRepository.findById(id);
+        if (doc.isPresent()) {
+            return doc.get();
+        }
+        // Create new document if not found
+        Document newDoc = new Document(id);
+        return documentRepository.save(newDoc);
     }
 
     public Document updateDocument(String id, String content) {
-        Document document = documents.computeIfAbsent(id, Document::new);
-        document.setContent(content);
-        return document;
+        Optional<Document> existingDoc = documentRepository.findById(id);
+        Document document;
+        
+        if (existingDoc.isPresent()) {
+            document = existingDoc.get();
+            document.setContent(content);
+        } else {
+            document = new Document(id, content);
+        }
+        
+        return documentRepository.save(document);
     }
 
     public boolean documentExists(String id) {
-        return documents.containsKey(id);
+        return documentRepository.existsById(id);
     }
 
     public void deleteDocument(String id) {
-        documents.remove(id);
+        documentRepository.deleteById(id);
     }
 }

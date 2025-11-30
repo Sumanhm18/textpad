@@ -208,7 +208,7 @@
         <div class="home-page">
             <h2>Notepad </h2>
             
-            <input type="text" id="docName" placeholder="Enter document name " autocomplete="on" />
+            <input type="text" id="docName" placeholder="Enter your page name" autocomplete="on" />
             <button onclick="openDocument()">Open Document</button>
             
             <!-- <div class="examples">
@@ -386,9 +386,9 @@
                     fetch('/api/document/' + currentDocId, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'text/plain'
                         },
-                        body: JSON.stringify(content)
+                        body: content
                     });
                 }, 300); // Wait 300ms after user stops typing
             });
